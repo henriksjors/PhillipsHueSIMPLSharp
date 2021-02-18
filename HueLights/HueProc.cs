@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Crestron.SimplSharp;
 using Newtonsoft.Json.Linq;
 
@@ -51,7 +50,7 @@ namespace HueLights
                 HueBridge.SetupDataStore();
                 string tempapi;
                 tempapi = HueBridge.GetDataStore();
-                if (HueBridge.LocalKey == true)
+                if (HueBridge.LocalKey)
                 {
                     HueBridge.BridgeApi = tempapi;
                     HueBridge.Authorized = true;
@@ -248,7 +247,7 @@ namespace HueLights
 					uid = (string)json[id]["uniqueid"];
 					if (json[id].SelectToken("swversion") != null)
 					swver = (string)json[id]["swversion"];
-					HueBridge.HueBulbs.Add(id, new HueBulb() { On = on, Type = type, Name = name, Model = model, Manufacturer = manufacturer, Uid = uid, SwVer = swver, Reachable = reachable});
+					HueBridge.HueBulbs.Add(id, new HueBulb { On = on, Type = type, Name = name, Model = model, Manufacturer = manufacturer, Uid = uid, SwVer = swver, Reachable = reachable});
 					if (json[id]["state"].SelectToken("bri") != null)
 					{
 						bri = (uint)json[id]["state"]["bri"];
@@ -358,7 +357,7 @@ namespace HueLights
 	                if (json[id].SelectToken("group") != null)
 	                {
 						group = (string)json[id]["group"];
-						if (HueBridge.HueGroups.ContainsKey(group)) { HueBridge.HueGroups[group].Scenes.Add(new HueScene() { Group = group, Name = name, SceneId = id }); }
+						if (HueBridge.HueGroups.ContainsKey(group)) { HueBridge.HueGroups[group].Scenes.Add(new HueScene { Group = group, Name = name, SceneId = id }); }
 	                }
 	                else
 	                {
@@ -368,8 +367,8 @@ namespace HueLights
 				
                 HueOnline = 1;
                 HueBridge.Populated = true;
-                GrpName = new String[50];
-                BlbName = new String[50];
+                GrpName = new String[100];
+                BlbName = new String[100];
 
 	            int i = 1;
 				foreach (KeyValuePair<string, HueGroup> entry in HueBridge.HueGroups)

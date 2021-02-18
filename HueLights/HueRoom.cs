@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Crestron.SimplSharp;
 using Newtonsoft.Json.Linq;
 
@@ -46,12 +45,7 @@ namespace HueLights
 
 	    public event EventHandler RoomOnlineUpdate;
 
-        public HueRoom()
-        {
-			
-        }
-
-	    public void RoomInit()
+        public void RoomInit()
 	    {
 			RoomOnline = 0;
 		    RoomId = 0;
@@ -64,7 +58,7 @@ namespace HueLights
 		    RoomXVal = 0;
 		    RoomYVal = 0;
 		    SceneNum = 0;
-		    if (HueBridge.Populated == true)
+		    if (HueBridge.Populated)
 		    {
 			    _foundroom = false;
 			    foreach (KeyValuePair<string, HueGroup> entry in HueBridge.HueGroups)
@@ -103,7 +97,7 @@ namespace HueLights
         {
             try
             {
-				if (_foundroom == true)
+				if (_foundroom)
 				{
 					_url = string.Format("http://{0}/api/{1}/{2}/{3}", HueBridge.BridgeIp, HueBridge.BridgeApi, "groups", RoomId);
 					_jsontext = HttpConnect.Instance.Request(_url, null, Crestron.SimplSharp.Net.Http.RequestType.Get);
@@ -170,15 +164,15 @@ namespace HueLights
         {
             try
             {
-                if (HueBridge.Authorized == true && HueBridge.Populated == true)
+                if (HueBridge.Authorized && HueBridge.Populated)
                 {
-                    Payload payload = new Payload(){SetType = "groups", LvlType = lvltype, OnOff = val, Effect = effect};
+                    var payload = new Payload {SetType = "groups", LvlType = lvltype, OnOff = val, Effect = effect};
                     string json = HueBridge.SetCmd(PayloadType.RoomOnOff, payload, RoomId);
-                    JArray JReturn = JArray.Parse(json);
+                    JArray jReturn = JArray.Parse(json);
                     string tokenreturn = "/groups/" + RoomId + "/action/on";
-                    foreach (var Jobj in JReturn)
+                    foreach (var jobj in jReturn)
                     {
-                        var myaction = Jobj["success"];
+                        var myaction = jobj["success"];
                         string whodidwhat = myaction.ToString();
                         if (whodidwhat.Contains(tokenreturn))
                         {
@@ -209,9 +203,9 @@ namespace HueLights
         {
             try
             {
-                if (HueBridge.Authorized == true && HueBridge.Populated == true)
+                if (HueBridge.Authorized && HueBridge.Populated)
                 {
-                    var payload = new Payload() { SetType = "groups", Lvl = val, LvlType = lvltype };
+                    var payload = new Payload { SetType = "groups", Lvl = val, LvlType = lvltype };
                     var json = HueBridge.SetCmd(PayloadType.Lvl, payload, RoomId);
 					
                     if (json.Contains("success"))
@@ -248,8 +242,6 @@ namespace HueLights
 									TriggerRoomCtUpdate();
 									break;
 								}
-                            default:
-                                break;
                         }
                     }
                 }
@@ -268,9 +260,9 @@ namespace HueLights
         {
             try
             {
-                if (HueBridge.Authorized == true && HueBridge.Populated == true)
+                if (HueBridge.Authorized && HueBridge.Populated)
                 {
-                    var payload = new Payload(){SetType = "groups", Scene = this.SceneId[i]};
+                    var payload = new Payload {SetType = "groups", Scene = SceneId[i]};
                     string json = HueBridge.SetCmd(PayloadType.Scene, payload, RoomId);
                     //CrestronConsole.PrintLine("json response: {0}",json);
                     if (json.Contains("success"))
@@ -293,9 +285,9 @@ namespace HueLights
         {
             try
             {
-                if (HueBridge.Authorized == true && HueBridge.Populated == true)
+                if (HueBridge.Authorized && HueBridge.Populated)
                 {
-                    var payload = new Payload() { SetType = "groups", Xval = xval, Yval = yval };
+                    var payload = new Payload { SetType = "groups", Xval = xval, Yval = yval };
                     string json = HueBridge.SetCmd(PayloadType.XY, payload, RoomId);
                 }
             }
@@ -307,37 +299,66 @@ namespace HueLights
 
         public void TriggerRoomBriUpdate()
         {
-            RoomBriUpdate(this, new EventArgs());
+            try {
+                RoomBriUpdate(this, new EventArgs());
+            } catch (Exception e) {
+                CrestronConsole.PrintLine("Error in TriggerRoomBriUpdate: {0}", e.Message);
+            }
+
         }
 
         public void TriggerRoomHueUpdate()
         {
-            RoomHueUpdate(this, new EventArgs());
+            try {
+                RoomHueUpdate(this, new EventArgs());
+            } catch (Exception e) {
+                CrestronConsole.PrintLine("Error in TriggerRoomHueUpdate: {0}", e.Message);
+            }
         }
 
         public void TriggerRoomSatUpdate()
         {
-            RoomSatUpdate(this, new EventArgs());
+            try {
+                RoomSatUpdate(this, new EventArgs());
+            } catch (Exception e) {
+                CrestronConsole.PrintLine("Error in TriggerRoomSatUpdate: {0}", e.Message);
+            }
         }
 
 		public void TriggerRoomCtUpdate()
 		{
-			RoomCtUpdate(this, new EventArgs());
-		}
+            try {
+                RoomCtUpdate(this, new EventArgs());
+            } catch (Exception e) {
+                CrestronConsole.PrintLine("Error in TriggerRoomCtUpdate: {0}", e.Message);
+            }
+        }
 
         public void TriggerRoomOnOffUpdate()
         {
-            RoomOnOffUpdate(this, new EventArgs());
+            try {
+                RoomOnOffUpdate(this, new EventArgs());
+            } catch (Exception e) {
+                CrestronConsole.PrintLine("Error in TriggerRoomOnOffUpdate: {0}", e.Message);
+            }
         }
 
         public void TriggerRoomUpdate()
         {
-            RoomUpdate(this, new EventArgs());
+            try {
+                RoomUpdate(this, new EventArgs());
+            } catch (Exception e) {
+                CrestronConsole.PrintLine("Error in TriggerRoomUpdate: {0}", e.Message);
+            }
         }
 
 	    public void TriggerRoomOnlineUpdate()
 	    {
-		    RoomOnlineUpdate(this, new EventArgs());
-	    }
+            try {
+                RoomOnlineUpdate(this, new EventArgs());
+            } catch (Exception e) {
+                CrestronConsole.PrintLine("Error in TriggerRoomOnlineUpdate: {0}", e.Message);
+            }
+        }
     }
 }
