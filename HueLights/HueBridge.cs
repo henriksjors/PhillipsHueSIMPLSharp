@@ -79,22 +79,25 @@ namespace HueLights
             {
 				_url = string.Format("http://{0}/api", BridgeIp);
 	            _cmd = "{\"devicetype\":\"my_hue_app#crestron\"}";
+                CrestronConsole.PrintLine("Connecting to HueBridge: {0}",_url);
 				_response = HttpConnect.Instance.Request(_url, _cmd, Crestron.SimplSharp.Net.Http.RequestType.Post);
-				if (_response.Contains("link button not pressed"))
+				CrestronConsole.PrintLine("HueBridge Answered with {0} bytes",_response.Length);
+                if (_response.Contains("link button not pressed"))
                 {
                     Authorized = false;
                     CrestronConsole.PrintLine("Registration incomplete press button and retry...");
                 }
 				else if (_response.Contains("username"))
-                {
-                    Authorized = true;
-					var data = JArray.Parse(_response);
-                    BridgeApi = (String)data[0]["success"]["username"];
-                    //CrestronConsole.PrintLine("API key is {0}",BridgeApi);
-                    if (CrestronDataStoreStatic.SetLocalStringValue("apikey", BridgeApi) != CrestronDataStore.CDS_ERROR.CDS_SUCCESS)
-                        CrestronConsole.PrintLine("error storing apikey");
-                    CrestronConsole.PrintLine("Bridge registration complete");
-                }
+				{
+				    Authorized = true;
+				    CrestronConsole.PrintLine("Registration found username...");
+				    var data = JArray.Parse(_response);
+				    BridgeApi = (String) data[0]["success"]["username"];
+				    CrestronConsole.PrintLine("API key is {0}", BridgeApi);
+				    if (CrestronDataStoreStatic.SetLocalStringValue("apikey", BridgeApi) != CrestronDataStore.CDS_ERROR.CDS_SUCCESS)
+				        CrestronConsole.PrintLine("error storing apikey");
+				    CrestronConsole.PrintLine("Bridge registration complete");
+				}
             }
             catch (Exception e)
             {
